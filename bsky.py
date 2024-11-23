@@ -78,14 +78,14 @@ if __name__ == "__main__":
 
             # real new post?
             if text and not (id in known_ids):
-                new_messages.insert(0, (id, date, handle, author, text))
+                new_messages.insert(0, (date, handle, author, text))
                 known_ids.append(id)
 
         # process new messages
         now = datetime.now(tz=timezone.utc).astimezone()
 
         for msg in new_messages:
-            id, date, handle, author, text = msg
+            date, handle, author, text = msg
 
             # calc time delta
             timedelta = ago(now - datetime.fromisoformat(date))
