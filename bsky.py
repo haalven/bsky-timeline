@@ -5,11 +5,12 @@
 login = ('your-handle-here','your-password-here')
 
 
-from bsky_connect import BskySession
+from atproto import Client
 from datetime import datetime, timezone
-from time import time, sleep
+from time import sleep
 from sys import exit
 import re
+import json
 
 # timedelta string
 def ago(td):
@@ -41,9 +42,10 @@ def match_fmt(text, pattern, FMT1, FMT2):
 
 if __name__ == "__main__":
 
-    # new API session
+    # new client
     handle, password = login
-    session = BskySession(handle, password)
+    client = Client()
+    client.login(handle, password)
 
     # main loop
     known_ids = []
@@ -51,8 +53,8 @@ if __name__ == "__main__":
 
         # API: get the feed
         try:
-            response = session.api_call(endpoint='app.bsky.feed.getTimeline')
-            feed = response['feed']
+            data = client.get_timeline(limit=30)
+            feed = data.feed
         except Exception:
             try: sleep(60)
             except KeyboardInterrupt: exit()
@@ -62,17 +64,16 @@ if __name__ == "__main__":
         new_messages = []
 
         for item in feed:
-            if 'reply' in item: continue
             # parse
             try:
-                post = item['post']
-                id   = post['cid']
-                text = post['record']['text'].strip()
-                date = post['record']['createdAt']
-                handle = '@' + post['author']['handle']
-                author = post['author']['displayName'].strip()
+                post = item.post
+                id   = post.cid
+                handle = post.author.handle
+                author = post.author.display_name.strip()
                 if not author: author = handle
-            except Exception:
+                text = post.record.text.strip()
+                date = post.record.created_at
+            except Exception as e:
                 continue
 
             # real new post?
@@ -104,5 +105,8 @@ if __name__ == "__main__":
             print(text + '\n')
 
         # wait…
+        try: sleep(60)
+        except KeyboardInterrupt: exit()
+
         try: sleep(60)
         except KeyboardInterrupt: exit()
