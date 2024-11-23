@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from time import sleep
 from sys import exit
 import re
-import json
+
 
 # timedelta string
 def ago(td):
