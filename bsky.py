@@ -68,7 +68,7 @@ if __name__ == "__main__":
             try:
                 post = item.post
                 id   = post.cid
-                handle = post.author.handle
+                handle = '@' + post.author.handle
                 author = post.author.display_name.strip()
                 if not author: author = handle
                 text = post.record.text.strip()
