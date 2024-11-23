@@ -107,6 +107,3 @@ if __name__ == "__main__":
         # wait…
         try: sleep(60)
         except KeyboardInterrupt: exit()
-
-        try: sleep(60)
-        except KeyboardInterrupt: exit()
