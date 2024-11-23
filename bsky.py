@@ -101,7 +101,7 @@ if __name__ == "__main__":
             text = match_fmt(text, pattern, '\x1B[38;5;196m', '\x1B[m')
 
             # printing
-            print(author, handle, '⋅', timedelta)
+            print('🦋', author, handle, '⋅', timedelta)
             print(text + '\n')
 
         # wait…
