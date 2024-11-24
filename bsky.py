@@ -7,12 +7,17 @@ login = ('your-handle-here','your-password-here')
 
 interval = 60
 
+play_sound = True
+
 
 from atproto import Client
+from os.path import abspath, dirname
 from datetime import datetime, timezone
 from time import sleep
 from sys import exit
 import re
+if play_sound:
+    from playsound3 import playsound
 
 
 # timedelta string
@@ -34,7 +39,7 @@ def ago(td):
 
 
 # xterm formatting signals
-clear = '\r\x1B[K'
+def clear(): return '\r\x1B[K'
 def fmt(code): return '\x1B[' + code + 'm'
 def col(code): return fmt('38;5;' + code)
 
@@ -49,7 +54,11 @@ def match_fmt(text, pattern, FMT1, FMT2):
 
 if __name__ == "__main__":
 
-    # new client
+    # my path
+    mypath = dirname(abspath(__file__))
+
+    # new bluesky client
+    print('connecting . . .')
     handle, password = login
     client = Client()
     client.login(handle, password)
@@ -63,7 +72,7 @@ if __name__ == "__main__":
         try: feed = client.get_timeline(limit=30).feed
         except Exception:
             try: sleep(interval)
-            except KeyboardInterrupt: print(clear); exit()
+            except KeyboardInterrupt: print(clear()); exit()
             continue
 
         # fill list of new messages
@@ -88,6 +97,7 @@ if __name__ == "__main__":
 
         # process new messages
         now = datetime.now(tz=timezone.utc).astimezone()
+        notify = False
         for msg in new_messages:
             date, handle, author, text = msg
 
@@ -111,7 +121,12 @@ if __name__ == "__main__":
             # message output
             print(author, handle, '⋅', timedelta)
             print(text + '\n')
+            notify = True
+
+        # play sound
+        if (play_sound and notify):
+            playsound(mypath + '/incoming.m4a')
 
         # wait…
         try: sleep(interval)
-        except KeyboardInterrupt: print(clear); exit()
+        except KeyboardInterrupt: print(clear()); exit()
