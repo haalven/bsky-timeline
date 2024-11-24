@@ -5,7 +5,7 @@
 
 login = ('your-handle-here','your-password-here')
 
-interval = 60
+interval = 60 # seconds
 
 play_sound = True
 
