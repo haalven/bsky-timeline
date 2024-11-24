@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-# 🦋 timeline live
+# Bluesky timeline live
+
 
 login = ('your-handle-here','your-password-here')
+
+interval = 60
 
 
 from atproto import Client
@@ -24,19 +27,23 @@ def ago(td):
     elif days >= 30:
         months = days / 30.437
         return f'{months:.1f}mo'
-    elif days >= 1:
-        return f'{days:.0f}d'
-    elif hour >= 1:
-        return f'{hour:.0f}h'
-    elif mins >= 1:
-        return f'{mins:.0f}m'
-    else:
-        return f'{secs:.0f}s'
+    elif days >= 1: return f'{days:.0f}d'
+    elif hour >= 1: return f'{hour:.0f}h'
+    elif mins >= 1: return f'{mins:.0f}m'
+    else: return f'{secs:.0f}s'
+
+
+# xterm formatting signals
+clear = '\r\x1B[K'
+def fmt(code): return '\x1B[' + code + 'm'
+def col(code): return fmt('38;5;' + code)
+
 
 # colored regex matches
 def match_fmt(text, pattern, FMT1, FMT2):
     p = re.compile(pattern, re.IGNORECASE)
-    def color_str(match): return FMT1 + match.group() + FMT2
+    def color_str(match):
+        return FMT1 + match.group() + FMT2
     return p.sub(color_str, text)
 
 
@@ -46,28 +53,26 @@ if __name__ == "__main__":
     handle, password = login
     client = Client()
     client.login(handle, password)
+    print('\n' + '🦋', 'Bluesky' + '\n')
 
     # main loop
     known_ids = []
     while True:
 
         # API: get the feed
-        try:
-            data = client.get_timeline(limit=30)
-            feed = data.feed
+        try: feed = client.get_timeline(limit=30).feed
         except Exception:
-            try: sleep(60)
-            except KeyboardInterrupt: exit()
+            try: sleep(interval)
+            except KeyboardInterrupt: print(clear); exit()
             continue
 
         # fill list of new messages
         new_messages = []
-
         for item in feed:
             # parse
             try:
                 post = item.post
-                id   = post.cid
+                id = post.cid
                 handle = '@' + post.author.handle
                 author = post.author.display_name.strip()
                 if not author: author = handle
@@ -78,32 +83,35 @@ if __name__ == "__main__":
 
             # real new post?
             if text and not (id in known_ids):
-                new_messages.insert(0, (date, handle, author, text))
+                new_messages.insert(0, (date,handle,author,text))
                 known_ids.append(id)
 
         # process new messages
         now = datetime.now(tz=timezone.utc).astimezone()
-
         for msg in new_messages:
             date, handle, author, text = msg
 
             # calc time delta
             timedelta = ago(now - datetime.fromisoformat(date))
 
-            # remove empty lines
-            while 2*'\n' in text: text = text.replace(2*'\n', '\n')
+            # remove line breaks
+            while 2*'\n' in text:
+                text = text.replace(2*'\n', '\n')
+            text = text.replace('\n', ' ')
 
-            # xterm formatting
-            author = '\x1B[38;5;33m\x1B[1m' + author + '\x1B[m'
-            handle = '\x1B[38;5;33m\x1B[2m' + handle + '\x1B[m'
-            timedelta = '\x1B[38;5;33m\x1B[2m' + timedelta + '\x1B[m'
+            # message formatting
+            author = col('33') + fmt('1') + author + fmt('')
+            handle = col('33') + fmt('2') + handle
+            timedelta += fmt('')
+
+            # highlighted patterns
             pattern = r'^(NEWS?:|BREAKING|SCOOP|BOMBSHELL)\b'
-            text = match_fmt(text, pattern, '\x1B[38;5;196m', '\x1B[m')
+            text = match_fmt(text, pattern, col('196'), fmt(''))
 
-            # printing
-            print('🦋', author, handle, '⋅', timedelta)
+            # message output
+            print(author, handle, '⋅', timedelta)
             print(text + '\n')
 
         # wait…
-        try: sleep(60)
-        except KeyboardInterrupt: exit()
+        try: sleep(interval)
+        except KeyboardInterrupt: print(clear); exit()
