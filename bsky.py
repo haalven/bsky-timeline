@@ -5,7 +5,7 @@
 
 login = ('your-handle-here','your-password-here')
 
-interval = 60 # seconds
+interval = 30 # seconds
 
 play_sound = True
 
@@ -39,7 +39,7 @@ def ago(td):
 
 
 # xterm formatting signals
-def clear(): return '\r\x1B[K'
+def ln_clear(): return '\r\x1B[K'
 def fmt(code): return '\x1B[' + code + 'm'
 def col(code): return fmt('38;5;' + code)
 
@@ -57,12 +57,17 @@ if __name__ == "__main__":
     # my path
     mypath = dirname(abspath(__file__))
 
-    # new bluesky client
-    print('connecting . . .')
+    # create bluesky client
+    print('\n' + '🦋', 'creating client...', end=' ', flush=True)
     handle, password = login
-    client = Client()
-    client.login(handle, password)
-    print('\n' + '🦋', 'Bluesky' + '\n')
+    try:
+        client = Client()
+        client.login(handle, password)
+    except Exception as e:
+        print(ln_clear() + 'client error:', str(e))
+        exit()
+    # success
+    print(ln_clear() + '🦋', 'Bluesky' + '\n')
 
     # main loop
     known_ids = []
@@ -72,7 +77,7 @@ if __name__ == "__main__":
         try: feed = client.get_timeline(limit=30).feed
         except Exception:
             try: sleep(interval)
-            except KeyboardInterrupt: print(clear()); exit()
+            except KeyboardInterrupt: print(ln_clear()); exit()
             continue
 
         # fill list of new messages
@@ -129,4 +134,6 @@ if __name__ == "__main__":
 
         # wait…
         try: sleep(interval)
-        except KeyboardInterrupt: print(clear()); exit()
+        except KeyboardInterrupt:
+            print(ln_clear(), end='')
+            exit()
