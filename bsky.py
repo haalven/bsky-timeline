@@ -75,7 +75,7 @@ if __name__ == "__main__":
     while True:
 
         # API: get the feed
-        try: feed = client.get_timeline(limit=30).feed
+        try: feed = client.get_timeline(limit=20).feed
         except Exception:
             try: sleep(interval)
             except KeyboardInterrupt: print(ln_clear()); exit()
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             timedelta += fmt('')
 
             # time critical
-            pattern = r'^(NEW:|NOW:|JUST IN|NEWS|BREAKING|SCOOP|BOMBSHELL)\b'
+            pattern = r'^(NEWS?:|(JUST IN|BREAKING|SCOOP|BOMBSHELL)\b)'
             p = re.compile(pattern, re.IGNORECASE)
             if bool(p.search(text)):
                 notify = True
