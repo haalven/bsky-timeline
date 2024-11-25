@@ -45,10 +45,9 @@ def col(code): return fmt('38;5;' + code)
 
 # colored regex matches
 def match_fmt(text, pattern, FMT1, FMT2):
-    p = re.compile(pattern, re.IGNORECASE)
     def color_str(match):
         return FMT1 + match.group() + FMT2
-    return p.sub(color_str, text)
+    return pattern.sub(color_str, text)
 
 
 if __name__ == "__main__":
@@ -105,6 +104,7 @@ if __name__ == "__main__":
 
         # process new messages
         now = datetime.now(tz=timezone.utc).astimezone()
+        new_posts = False
         notify = False
         for msg in new_messages:
             date, handle, author, text = msg
@@ -122,18 +122,21 @@ if __name__ == "__main__":
             handle = col('33') + fmt('2') + handle
             timedelta += fmt('')
 
-            # highlighted patterns
-            pattern = r'^(NEWS?:|BREAKING|SCOOP|BOMBSHELL)\b'
-            text = match_fmt(text, pattern, col('196'), fmt(''))
+            # time critical
+            pattern = r'^(NEW:|NOW:|JUST IN|NEWS|BREAKING|SCOOP|BOMBSHELL)\b'
+            p = re.compile(pattern, re.IGNORECASE)
+            if bool(p.search(text)):
+                notify = True
+                text = match_fmt(text, p, col('196'), fmt(''))
 
             # message output
             print(author, handle, '⋅', timedelta)
             print(text)
-            notify = True
+            new_posts = True
 
         # newline
-        if notify: print()
-        # play sound
+        if new_posts: print()
+        # notify sound
         if (play_sound and notify):
             playsound(mypath + '/incoming.m4a')
 
