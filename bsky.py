@@ -10,7 +10,6 @@ interval = 30 # seconds
 play_sound = True
 
 
-from atproto import Client
 from os.path import abspath, dirname
 from datetime import datetime, timezone
 from time import sleep
@@ -58,7 +57,9 @@ if __name__ == "__main__":
     mypath = dirname(abspath(__file__))
 
     # create bluesky client
-    print('\n' + '🦋', 'creating client...', end=' ', flush=True)
+    print('\n' + '🦋', 'loading atproto...', end=' ', flush=True)
+    from atproto import Client
+    print(ln_clear() + '🦋', 'creating client...', end=' ', flush=True)
     handle, password = login
     try:
         client = Client()
