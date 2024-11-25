@@ -57,9 +57,10 @@ if __name__ == "__main__":
     mypath = dirname(abspath(__file__))
 
     # create bluesky client
-    print('\n' + '🦋', 'loading atproto...', end=' ', flush=True)
+    logo = chr(129419)
+    print('\n' + logo, 'loading atproto...', end=' ', flush=True)
     from atproto import Client
-    print(ln_clear() + '🦋', 'creating client...', end=' ', flush=True)
+    print(ln_clear() + logo, 'creating client...', end=' ', flush=True)
     handle, password = login
     try:
         client = Client()
@@ -68,7 +69,7 @@ if __name__ == "__main__":
         print(ln_clear() + 'client error:', str(e))
         exit()
     # success
-    print(ln_clear() + '🦋', 'Bluesky' + '\n')
+    print(ln_clear() + logo, 'Bluesky' + '\n')
 
     # main loop
     known_ids = []
@@ -87,6 +88,7 @@ if __name__ == "__main__":
             # parse
             try:
                 post = item.post
+                if post.record.reply: continue
                 id = post.cid
                 handle = '@' + post.author.handle
                 author = post.author.display_name.strip()
@@ -126,9 +128,11 @@ if __name__ == "__main__":
 
             # message output
             print(author, handle, '⋅', timedelta)
-            print(text + '\n')
+            print(text)
             notify = True
 
+        # newline
+        if notify: print()
         # play sound
         if (play_sound and notify):
             playsound(mypath + '/incoming.m4a')
