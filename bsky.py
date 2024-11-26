@@ -3,6 +3,7 @@
 
 # Bluesky timeline live
 # usage: bsky [--critical]
+
 # https://github.com/MarshalX/atproto
 # https://atproto.blue/en/latest/atproto_client/client.html
 
@@ -15,11 +16,11 @@ play_sound = True
 
 
 import argparse
-from os.path import abspath, dirname
+import re
+from sys import argv, exit
+from os.path import abspath, dirname, basename
 from datetime import datetime, timezone
 from time import sleep
-from sys import exit
-import re
 if play_sound:
     from playsound3 import playsound
 
@@ -58,8 +59,12 @@ def match_fmt(text, pattern, FMT1, FMT2):
 if __name__ == "__main__":
 
     # argument
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--critical", action='store_true', required=False)
+    myname = basename(argv[0])
+    parser = argparse.ArgumentParser(prog=myname)
+    parser.add_argument('--critical',
+                        action='store_true',
+                        help='print critical posts only',
+                        required=False)
     args = parser.parse_args()
     critical_only = args.critical
 
@@ -69,15 +74,19 @@ if __name__ == "__main__":
     # create bluesky client
     logo = chr(129419)
     print('\n' + logo, 'loading atproto...', end=' ', flush=True)
-    from atproto import Client
-    print(ln_clear() + logo, 'creating client...', end=' ', flush=True)
-    handle, password = login
     try:
+        from atproto import Client
+    except Exception as e:
+        print(ln_clear())
+        exit('atproto error: ' + str(e))
+    print(ln_clear() + logo, 'creating client...', end=' ', flush=True)
+    try:
+        handle, password = login
         client = Client()
         profile = client.login(handle, password)
     except Exception as e:
-        print(ln_clear() + 'client error:', str(e))
-        exit()
+        print(ln_clear())
+        exit('client error: ' + str(e))
     # client success
     print(ln_clear() + logo, profile['handle'] + '\n')
 
