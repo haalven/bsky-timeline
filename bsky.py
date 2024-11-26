@@ -66,7 +66,6 @@ if __name__ == "__main__":
                         help='print critical posts only',
                         required=False)
     args = parser.parse_args()
-    critical_only = args.critical
 
     # my path
     mypath = dirname(abspath(__file__))
@@ -150,7 +149,7 @@ if __name__ == "__main__":
                 text = match_fmt(text, p, col('196'), fmt(''))
 
             # print message
-            if critical_only and (not critical): continue
+            if args.critical and (not critical): continue
             new_posts = True
             print(author, handle, '⋅', timedelta)
             print(text)
