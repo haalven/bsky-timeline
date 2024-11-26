@@ -2,6 +2,7 @@
 
 
 # Bluesky timeline live
+# usage: bsky [--critical]
 # https://github.com/MarshalX/atproto
 # https://atproto.blue/en/latest/atproto_client/client.html
 
@@ -12,9 +13,8 @@ interval = 30 # seconds
 
 play_sound = True
 
-critical_only = False
 
-
+import argparse
 from os.path import abspath, dirname
 from datetime import datetime, timezone
 from time import sleep
@@ -56,6 +56,12 @@ def match_fmt(text, pattern, FMT1, FMT2):
 
 
 if __name__ == "__main__":
+
+    # argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--critical", action='store_true', required=False)
+    args = parser.parse_args()
+    critical_only = args.critical
 
     # my path
     mypath = dirname(abspath(__file__))
