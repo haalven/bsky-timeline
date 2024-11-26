@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 # Bluesky timeline live
 # usage: bsky [--critical]
 
@@ -56,7 +55,7 @@ def match_fmt(text, pattern, FMT1, FMT2):
     return pattern.sub(color_str, text)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # argument
     myname = basename(argv[0])
