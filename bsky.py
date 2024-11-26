@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
+
 # Bluesky timeline live
+# https://github.com/MarshalX/atproto
+# https://atproto.blue/en/latest/atproto_client/client.html
 
 
 login = ('your-handle-here','your-password-here')
@@ -8,6 +11,8 @@ login = ('your-handle-here','your-password-here')
 interval = 30 # seconds
 
 play_sound = True
+
+critical_only = False
 
 
 from os.path import abspath, dirname
@@ -63,12 +68,12 @@ if __name__ == "__main__":
     handle, password = login
     try:
         client = Client()
-        client.login(handle, password)
+        profile = client.login(handle, password)
     except Exception as e:
         print(ln_clear() + 'client error:', str(e))
         exit()
     # client success
-    print(ln_clear() + logo, 'Bluesky' + '\n')
+    print(ln_clear() + logo, profile['handle'] + '\n')
 
     # main loop
     known_ids = []
@@ -104,8 +109,7 @@ if __name__ == "__main__":
 
         # process new messages
         now = datetime.now(tz=timezone.utc).astimezone()
-        new_posts = False
-        notify = False
+        new_posts, new_criticals = False, False
         for msg in new_messages:
             date, handle, author, text = msg
 
@@ -123,21 +127,23 @@ if __name__ == "__main__":
             timedelta += fmt('')
 
             # detect critical
+            critical = False
             pattern = r'^(NEW:|(NEWS|JUST IN|BREAKING|SCOOP|BOMBSHELL)\b)'
             p = re.compile(pattern, re.IGNORECASE)
             if bool(p.search(text)):
-                notify = True
+                critical, new_criticals = True, True
                 text = match_fmt(text, p, col('196'), fmt(''))
 
             # print message
+            if critical_only and (not critical): continue
+            new_posts = True
             print(author, handle, '⋅', timedelta)
             print(text)
-            new_posts = True
 
         # newline
         if new_posts: print()
         # notify sound
-        if (play_sound and notify):
+        if play_sound and new_criticals:
             playsound(mypath + '/incoming.m4a')
 
         # wait…
