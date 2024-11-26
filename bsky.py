@@ -67,7 +67,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(ln_clear() + 'client error:', str(e))
         exit()
-    # success
+    # client success
     print(ln_clear() + logo, 'Bluesky' + '\n')
 
     # main loop
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         # fill list of new messages
         new_messages = []
         for item in feed:
-            # parse
+            # parse feed
             try:
                 post = item.post
                 if post.record.reply: continue
@@ -97,7 +97,7 @@ if __name__ == "__main__":
             except Exception as e:
                 continue
 
-            # real new post?
+            # a real new post?
             if text and not (id in known_ids):
                 new_messages.insert(0, (date,handle,author,text))
                 known_ids.append(id)
@@ -109,10 +109,10 @@ if __name__ == "__main__":
         for msg in new_messages:
             date, handle, author, text = msg
 
-            # calc time delta
+            # calculate timedelta
             timedelta = ago(now - datetime.fromisoformat(date))
 
-            # remove line breaks
+            # remove newlines
             while 2*'\n' in text:
                 text = text.replace(2*'\n', '\n')
             text = text.replace('\n', ' ')
@@ -122,14 +122,14 @@ if __name__ == "__main__":
             handle = col('33') + fmt('2') + handle
             timedelta += fmt('')
 
-            # time critical
-            pattern = r'^(NEWS?:|(JUST IN|BREAKING|SCOOP|BOMBSHELL)\b)'
+            # detect critical
+            pattern = r'^(NEW:|(NEWS|JUST IN|BREAKING|SCOOP|BOMBSHELL)\b)'
             p = re.compile(pattern, re.IGNORECASE)
             if bool(p.search(text)):
                 notify = True
                 text = match_fmt(text, p, col('196'), fmt(''))
 
-            # message output
+            # print message
             print(author, handle, '⋅', timedelta)
             print(text)
             new_posts = True
