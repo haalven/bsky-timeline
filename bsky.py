@@ -24,7 +24,7 @@ if play_sound:
     from playsound3 import playsound
 
 
-# timedelta string
+# readable timedelta
 def ago(td):
     secs = td.total_seconds()
     mins, secs = divmod(secs, 60)
@@ -86,13 +86,13 @@ if __name__ == '__main__':
         print(ln_clear())
         exit('client error: ' + str(e))
     # client success
-    print(ln_clear() + logo, profile['handle'] + '\n')
+    print(ln_clear() + logo, '@' + profile['handle'] + '\n')
 
     # main loop
     known_ids = []
     while True:
 
-        # API: get the feed
+        # get the feed
         try: feed = client.get_timeline(limit=20).feed
         except Exception:
             try: sleep(interval)
@@ -157,7 +157,8 @@ if __name__ == '__main__':
         if new_posts: print()
         # notify sound
         if play_sound and new_criticals:
-            playsound(mypath + '/incoming.m4a')
+            try: playsound(mypath + '/incoming.m4a')
+            except Exception: pass
 
         # wait…
         try: sleep(interval)
