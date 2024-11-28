@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 # Bluesky timeline live
 # usage: bsky [--critical]
 
@@ -16,7 +17,7 @@ play_sound = True
 
 import argparse
 import re
-from sys import argv, exit
+from sys import exit
 from os.path import abspath, dirname, basename
 from datetime import datetime, timezone
 from time import sleep
@@ -57,17 +58,17 @@ def match_fmt(text, pattern, FMT1, FMT2):
 
 if __name__ == '__main__':
 
+    # my path
+    mypath = abspath(__file__)
+    mydir, myname = dirname(mypath), basename(mypath)
+
     # argument
-    myname = basename(argv[0])
     parser = argparse.ArgumentParser(prog=myname)
     parser.add_argument('--critical',
                         action='store_true',
                         help='print critical posts only',
                         required=False)
     args = parser.parse_args()
-
-    # my path
-    mypath = dirname(abspath(__file__))
 
     # create bluesky client
     logo = chr(129419)
@@ -157,7 +158,7 @@ if __name__ == '__main__':
         if new_posts: print()
         # notify sound
         if play_sound and new_criticals:
-            try: playsound(mypath + '/incoming.m4a')
+            try: playsound(mydir + '/incoming.m4a')
             except Exception: pass
 
         # wait…
