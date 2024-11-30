@@ -14,6 +14,8 @@ interval = 30 # seconds
 
 play_sound = True
 
+write_log = False
+
 
 import argparse
 import re
@@ -135,6 +137,15 @@ if __name__ == '__main__':
                 text = text.replace(2*'\n', '\n')
             text = text.replace('\n', ' ')
 
+            # write log
+            if write_log:
+                logdate = now.strftime('%y-%m-%d')
+                logtime = now.strftime('%H:%M:%S')
+                logfile = mydir + '/bsky-' + logdate + '.log'
+                logdata = (logtime, '<'+handle+'>', text + 2*'\n')
+                with open(logfile, 'a') as log:
+                    log.write(' '.join(logdata))
+
             # message formatting
             author = col('33') + fmt('1') + author + fmt('')
             handle = col('33') + fmt('2') + handle
@@ -166,3 +177,4 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             print(ln_clear(), end='')
             exit()
+
