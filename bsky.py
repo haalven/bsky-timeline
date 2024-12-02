@@ -153,7 +153,7 @@ if __name__ == '__main__':
 
             # detect critical
             critical = False
-            pattern = r'^(NEWS?|JUST IN|BREAKING|SCOOP|BOMBSHELL)\b'
+            pattern = r'^(NEWS?|(THIS )?JUST IN|BREAKING|SCOOP|BOMBSHELL)\b'
             p = re.compile(pattern, re.IGNORECASE)
             if bool(p.search(text)):
                 critical, new_criticals = True, True
