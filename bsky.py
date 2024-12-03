@@ -125,7 +125,7 @@ if __name__ == '__main__':
 
         # process new messages
         now = datetime.now(tz=timezone.utc).astimezone()
-        new_criticals = False, False
+        new_criticals = False
         for msg in new_messages:
             date, handle, author, text = msg
 
