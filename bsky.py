@@ -125,7 +125,7 @@ if __name__ == '__main__':
 
         # process new messages
         now = datetime.now(tz=timezone.utc).astimezone()
-        new_posts, new_criticals = False, False
+        new_criticals = False, False
         for msg in new_messages:
             date, handle, author, text = msg
 
@@ -161,12 +161,9 @@ if __name__ == '__main__':
 
             # print message
             if args.critical and (not critical): continue
-            new_posts = True
             print(author, handle, '⋅', timedelta)
             print(text)
 
-        # newline
-        if new_posts: print()
         # notify sound
         if play_sound and new_criticals:
             try: playsound(mydir + '/incoming.m4a')
