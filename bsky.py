@@ -2,7 +2,7 @@
 
 
 # Bluesky timeline live
-# usage: bsky [--critical]
+# usage: bsky [--critical] [--silent]
 
 # https://github.com/MarshalX/atproto
 # https://atproto.blue/en/latest/atproto_client/client.html
@@ -10,11 +10,9 @@
 
 login = ('your-handle-here','your-password-here')
 
-interval = 30 # seconds
+interval = 20 # seconds
 
-play_sound = True
-
-write_log = False
+enable_sound = True
 
 
 import argparse
@@ -23,7 +21,7 @@ from sys import exit
 from os.path import abspath, dirname, basename
 from datetime import datetime, timezone
 from time import sleep
-if play_sound:
+if enable_sound:
     from playsound3 import playsound
 
 
@@ -70,7 +68,12 @@ if __name__ == '__main__':
                         action='store_true',
                         help='print critical posts only',
                         required=False)
+    parser.add_argument('--silent',
+                        action='store_true',
+                        help='no sound',
+                        required=False)
     args = parser.parse_args()
+
 
     # create bluesky client
     logo = chr(129419)
@@ -109,6 +112,7 @@ if __name__ == '__main__':
             try:
                 post = item.post
                 if post.record.reply: continue
+                reposter = '@'+item.reason.by.handle if item.reason else None
                 id = post.cid
                 handle = '@' + post.author.handle
                 author = post.author.display_name.strip()
@@ -120,14 +124,14 @@ if __name__ == '__main__':
 
             # a real new post?
             if text and not (id in known_ids):
-                new_messages.insert(0, (date,handle,author,text))
+                new_messages.insert(0, (date,reposter,handle,author,text))
                 known_ids.append(id)
 
         # process new messages
         now = datetime.now(tz=timezone.utc).astimezone()
         new_criticals = False
         for msg in new_messages:
-            date, handle, author, text = msg
+            date, reposter, handle, author, text = msg
 
             # calculate timedelta
             timedelta = ago(now - datetime.fromisoformat(date))
@@ -137,16 +141,10 @@ if __name__ == '__main__':
                 text = text.replace(2*'\n', '\n')
             text = text.replace('\n', ' ')
 
-            # write log
-            if write_log:
-                logdate = now.strftime('%y-%m-%d')
-                logtime = now.strftime('%H:%M:%S')
-                logfile = mydir + '/bsky-' + logdate + '.log'
-                logdata = (logtime, '<'+handle+'>', text + 2*'\n')
-                with open(logfile, 'a') as log:
-                    log.write(' '.join(logdata))
-
             # message formatting
+            if reposter:
+                reposter = '⇄ Reposted by ' + reposter
+                reposter = col('33') + fmt('2') + reposter + fmt('')
             author = col('33') + fmt('1') + author + fmt('')
             handle = col('33') + fmt('2') + handle
             timedelta += fmt('')
@@ -161,11 +159,12 @@ if __name__ == '__main__':
 
             # print message
             if args.critical and (not critical): continue
+            if reposter: print(reposter)
             print(author, handle, '⋅', timedelta)
-            print(text)
+            print(text + '\n')
 
         # notify sound
-        if play_sound and new_criticals:
+        if enable_sound and (not args.silent) and new_criticals:
             try: playsound(mydir + '/incoming.m4a')
             except Exception: pass
 
