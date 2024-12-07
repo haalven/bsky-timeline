@@ -63,7 +63,7 @@ if __name__ == '__main__':
     mypath = abspath(__file__)
     mydir, myname = dirname(mypath), basename(mypath)
 
-    # argument
+    # arguments
     parser = argparse.ArgumentParser(prog=myname)
     parser.add_argument('--critical',
                         action='store_true',
