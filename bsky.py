@@ -138,8 +138,7 @@ if __name__ == '__main__':
             timedelta = ago(now - datetime.fromisoformat(date))
 
             # remove newlines
-            while 2*'\n' in text:
-                text = text.replace(2*'\n', '\n')
+            while 2*'\n' in text: text = text.replace(2*'\n', '\n')
             text = text.replace('\n', ' ')
 
             # message formatting
