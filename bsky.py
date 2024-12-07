@@ -75,7 +75,6 @@ if __name__ == '__main__':
                         required=False)
     args = parser.parse_args()
 
-
     # create bluesky client
     logo = chr(129419)
     print('\n' + logo, 'loading atproto...', end=' ', flush=True)
