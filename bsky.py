@@ -56,6 +56,7 @@ def match_fmt(text, pattern, FMT1, FMT2):
     return pattern.sub(color_str, text)
 
 
+
 if __name__ == '__main__':
 
     # my path
@@ -151,7 +152,7 @@ if __name__ == '__main__':
 
             # detect critical
             critical = False
-            pattern = r'^(NEWS?|(THIS )?JUST IN|BREAKING|SCOOP|BOMBSHELL)\b'
+            pattern = r'^(BREAKING|BOMBSHELL)\b'
             p = re.compile(pattern, re.IGNORECASE)
             if bool(p.search(text)):
                 critical, new_criticals = True, True
