@@ -18,7 +18,8 @@ enable_sound = True
 import argparse
 import re
 from sys import exit
-from os.path import abspath, dirname, basename
+from os.path import abspath, dirname, basename, isdir
+from os import environ
 from datetime import datetime, timezone
 from time import sleep
 if enable_sound:
@@ -75,6 +76,17 @@ if __name__ == '__main__':
                         required=False)
     args = parser.parse_args()
 
+    # prepare logging (set log_folder)
+    log_folder = environ['BSKY_LOG_FOLDER'] if 'BSKY_LOG_FOLDER' in environ else None
+    if log_folder:
+        # remove trailing slash
+        while log_folder.endswith('/') and not (log_folder == '/'):
+            log_folder = log_folder[:-1]
+        # check path
+        if not isdir(log_folder):
+            print('the folder', log_folder, 'does not exist!')
+            exit('logging error')
+
     # create bluesky client
     logo = chr(129419)
     print('\n' + logo, 'loading atproto...', end=' ', flush=True)
@@ -114,7 +126,9 @@ if __name__ == '__main__':
                 if post.record.reply: continue
                 reposter = '@'+item.reason.by.handle if item.reason else None
                 id = post.cid
-                handle = '@' + post.author.handle
+                handle = post.author.handle
+                if not handle: continue
+                handle = '@' + handle
                 author = post.author.display_name.strip()
                 if not author: author = handle
                 text = post.record.text.strip()
@@ -129,16 +143,27 @@ if __name__ == '__main__':
 
         # process new messages
         now = datetime.now(tz=timezone.utc).astimezone()
+        log = log_folder + '/bsky_' + now.strftime('%Y-%m-%d') + '.log' if log_folder else None
         new_criticals = False
+
         for msg in new_messages:
+            # expand msg
             date, reposter, handle, author, text = msg
 
-            # calculate timedelta
-            timedelta = ago(now - datetime.fromisoformat(date))
+            # datetime object
+            timestamp = datetime.fromisoformat(date).astimezone()
 
             # remove newlines
             while 2*'\n' in text: text = text.replace(2*'\n', '\n')
-            text = text.replace('\n', ' ')
+            text = text.replace('\n', '\x20')
+
+            # log message
+            if log:
+                line = timestamp.isoformat() + '\x20' + handle + '\x20' + text + '\n'
+                with open(log, 'a') as f: f.write(line)
+
+            # calculate timedelta
+            timedelta = ago(now - timestamp)
 
             # message formatting
             if reposter:
