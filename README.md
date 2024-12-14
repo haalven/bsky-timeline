@@ -4,3 +4,4 @@
 - adjust `login`, `interval` and `enable_sound`
 - usage: `bsky [--critical] [--silent]`
 - you can run this thing in [`tmux`](https://tmux.github.io/)
+- export `$BSKY_LOG_PATH` to enable logging
