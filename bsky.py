@@ -100,7 +100,7 @@ if __name__ == '__main__':
         handle, password = login
         client = Client()
         profile = client.login(handle, password)
-    except Exception as e:
+    except Exception as e: # crash
         print(ln_clear())
         exit('client error: ' + str(e))
     # client success
@@ -112,7 +112,7 @@ if __name__ == '__main__':
 
         # get the feed
         try: feed = client.get_timeline(limit=20).feed
-        except Exception:
+        except Exception: # wait
             try: sleep(interval)
             except KeyboardInterrupt: print(ln_clear()); exit()
             continue
