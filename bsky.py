@@ -175,7 +175,7 @@ if __name__ == '__main__':
             while 2*'\n' in text: text = text.replace(2*'\n', '\n')
             text = text.replace('\n', ';\x20')
             while 2*'\x20' in text: text = text.replace(2*'\x20', '\x20')
-            text = remove_emojis(text)
+            text, author = (remove_emojis(text), remove_emojis(author))
 
             # log message
             if log:
