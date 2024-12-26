@@ -57,6 +57,24 @@ def match_fmt(text, pattern, FMT1, FMT2):
     return pattern.sub(color_str, text)
 
 
+# remove emojis
+def remove_emojis(text):
+    emoji_pattern = re.compile(
+        "[\U0001F600-\U0001F64F"
+        "\U0001F300-\U0001F5FF"
+        "\U0001F680-\U0001F6FF"
+        "\U0001F1E0-\U0001F1FF"
+        "\U00002700-\U000027BF"
+        "\U0001F900-\U0001F9FF"
+        "\U00002600-\U000026FF"
+        "\U00002B50-\U00002BFF"
+        "\U0001FA70-\U0001FAFF"
+        "\U000025A0-\U000025FF"
+        "]+",
+        flags=re.UNICODE
+    )
+    return emoji_pattern.sub('', text)
+
 
 if __name__ == '__main__':
 
@@ -153,9 +171,11 @@ if __name__ == '__main__':
             # datetime object
             timestamp = datetime.fromisoformat(date).astimezone()
 
-            # remove newlines
+            # remove newlines, double spaces and emojis
             while 2*'\n' in text: text = text.replace(2*'\n', '\n')
-            text = text.replace('\n', '\x20')
+            text = text.replace('\n', ';')
+            while 2*'\x20' in text: text = text.replace(2*'\x20', '\x20')
+            text = remove_emojis(text)
 
             # log message
             if log:
@@ -173,7 +193,7 @@ if __name__ == '__main__':
             handle = col('33') + fmt('2') + handle
             timedelta += fmt('')
 
-            # detect critical
+            # detect and format critical
             critical = False
             pattern = r'^(BREAKING|BOMBSHELL)\b'
             p = re.compile(pattern, re.IGNORECASE)
