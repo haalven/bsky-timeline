@@ -60,17 +60,17 @@ def match_fmt(text, pattern, FMT1, FMT2):
 # remove emojis
 def remove_emojis(text):
     emoji_pattern = re.compile(
-        "[\U0001F600-\U0001F64F"
-        "\U0001F300-\U0001F5FF"
-        "\U0001F680-\U0001F6FF"
-        "\U0001F1E0-\U0001F1FF"
-        "\U00002700-\U000027BF"
-        "\U0001F900-\U0001F9FF"
-        "\U00002600-\U000026FF"
-        "\U00002B50-\U00002BFF"
-        "\U0001FA70-\U0001FAFF"
-        "\U000025A0-\U000025FF"
-        "]+",
+        '[\U0001F600-\U0001F64F'
+        '\U0001F300-\U0001F5FF'
+        '\U0001F680-\U0001F6FF'
+        '\U0001F1E0-\U0001F1FF'
+        '\U00002700-\U000027BF'
+        '\U0001F900-\U0001F9FF'
+        '\U00002600-\U000026FF'
+        '\U00002B50-\U00002BFF'
+        '\U0001FA70-\U0001FAFF'
+        '\U000025A0-\U000025FF'
+        ']+',
         flags=re.UNICODE
     )
     return emoji_pattern.sub('', text)
