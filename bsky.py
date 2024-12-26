@@ -173,7 +173,7 @@ if __name__ == '__main__':
 
             # remove newlines, double spaces and emojis
             while 2*'\n' in text: text = text.replace(2*'\n', '\n')
-            text = text.replace('\n', ';')
+            text = text.replace('\n', ';\x20')
             while 2*'\x20' in text: text = text.replace(2*'\x20', '\x20')
             text = remove_emojis(text)
 
