@@ -76,8 +76,7 @@ def remove_emojis(text):
     return emoji_pattern.sub('', text)
 
 
-if __name__ == '__main__':
-
+def main() -> int:
     # my path
     mypath = abspath(__file__)
     mydir, myname = dirname(mypath), basename(mypath)
@@ -179,7 +178,7 @@ if __name__ == '__main__':
             # log message
             if log:
                 line = timestamp.isoformat() + '\x20' + handle + '\x20' + text + '\n'
-                with open(log, 'a') as f: f.write(line)
+                with open(log, 'a') as logfile: logfile.write(line)
 
             # calculate timedelta
             timedelta = ago(now - timestamp)
@@ -215,4 +214,8 @@ if __name__ == '__main__':
         try: sleep(interval)
         except KeyboardInterrupt:
             print(ln_clear(), end='')
-            exit()
+            return 0
+
+
+if __name__ == '__main__':
+    exit(main())
