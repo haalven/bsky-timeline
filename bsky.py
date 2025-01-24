@@ -102,7 +102,7 @@ def main() -> int:
         # check path
         if not isdir(log_folder):
             print('the folder', log_folder, 'does not exist!')
-            exit('logging error')
+            return 'logging error'
 
     # create bluesky client
     logo = chr(129419)
@@ -111,7 +111,7 @@ def main() -> int:
         from atproto import Client
     except Exception as e:
         print(ln_clear())
-        exit('atproto error: ' + str(e))
+        return 'atproto error: ' + str(e)
     print(ln_clear() + logo, 'creating client...', end=' ', flush=True)
     try:
         handle, password = login
@@ -119,7 +119,7 @@ def main() -> int:
         profile = client.login(handle, password)
     except Exception as e: # crash
         print(ln_clear())
-        exit('client error: ' + str(e))
+        return 'client error: ' + str(e)
     # client success
     print(ln_clear() + logo, '@' + profile['handle'] + '\n')
 
@@ -131,7 +131,9 @@ def main() -> int:
         try: feed = client.get_timeline(limit=20).feed
         except Exception: # wait
             try: sleep(interval)
-            except KeyboardInterrupt: print(ln_clear()); exit()
+            except KeyboardInterrupt:
+                print(ln_clear())
+                return 0
             continue
 
         # fill list of new messages
