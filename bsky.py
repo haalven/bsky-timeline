@@ -46,8 +46,8 @@ def ago(td):
 
 # xterm formatting signals
 def ln_clear(): return '\r\x1B[K'
-def fmt(code): return '\x1B[' + code + 'm'
-def col(code): return fmt('38;5;' + code)
+def f(code): return '\x1B[' + str(code) + 'm'
+def c(code): return f('38;5;' + str(code))
 
 
 # colored regex matches
@@ -171,10 +171,9 @@ if __name__ == '__main__':
             # datetime object
             timestamp = datetime.fromisoformat(date).astimezone()
 
-            # remove newlines, double spaces and emojis
+            # handle newlines, emojis
             while 2*'\n' in text: text = text.replace(2*'\n', '\n')
-            text = text.replace('\n', ';\x20')
-            while 2*'\x20' in text: text = text.replace(2*'\x20', '\x20')
+            text = text.replace('\n', ' ⏎ ')
             text, author = (remove_emojis(text), remove_emojis(author))
 
             # log message
@@ -188,10 +187,10 @@ if __name__ == '__main__':
             # message formatting
             if reposter:
                 reposter = '⇄ Reposted by ' + reposter
-                reposter = col('33') + fmt('2') + reposter + fmt('')
-            author = col('33') + fmt('1') + author + fmt('')
-            handle = col('33') + fmt('2') + handle
-            timedelta += fmt('')
+                reposter = c(33) + f(2) + reposter + f(0)
+            author = c(33) + f(1) + author + f(0)
+            handle = c(33) + f(2) + handle
+            timedelta += f(0)
 
             # detect and format critical
             critical = False
@@ -199,7 +198,7 @@ if __name__ == '__main__':
             p = re.compile(pattern, re.IGNORECASE)
             if bool(p.search(text)):
                 critical, new_criticals = True, True
-                text = match_fmt(text, p, col('196'), fmt(''))
+                text = match_fmt(text, p, c(196), f(0))
 
             # print message
             if args.critical and (not critical): continue
