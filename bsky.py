@@ -8,22 +8,36 @@
 # https://atproto.blue/en/latest/atproto_client/client.html
 
 
-login = ('your-handle-here','your-password-here')
-
-interval = 60 # seconds
-
-enable_sound = True
-
-
+import sys
+import os.path
+import tomllib
 import argparse
 import re
-from sys import exit
-from os.path import abspath, dirname, basename, isdir
-from os import environ
+import time
 from datetime import datetime, timezone
-from time import sleep
-if enable_sound:
-    from playsound3 import playsound
+
+
+# read TOML file
+def read_configuration(my_dir, my_name):
+    config_path = os.path.join(my_dir, my_name + '.toml')
+    try:
+        with open(config_path, 'rb') as f:
+            return tomllib.load(f)
+    except: return None
+
+
+# parse arguments
+def get_arguments(my_name):
+    parser = argparse.ArgumentParser(prog=my_name)
+    parser.add_argument('--critical',
+                        action='store_true',
+                        help='print critical posts only',
+                        required=False)
+    parser.add_argument('--silent',
+                        action='store_true',
+                        help='no sound',
+                        required=False)
+    return parser.parse_args()
 
 
 # readable timedelta
@@ -59,17 +73,9 @@ def match_fmt(text, pattern, FMT1, FMT2):
 
 # remove emojis
 def remove_emojis(text):
-    emoji_pattern = re.compile(
-        '[\U0001F600-\U0001F64F'
-        '\U0001F300-\U0001F5FF'
-        '\U0001F680-\U0001F6FF'
-        '\U0001F1E0-\U0001F1FF'
-        '\U00002700-\U000027BF'
-        '\U0001F900-\U0001F9FF'
-        '\U00002600-\U000026FF'
-        '\U00002B50-\U00002BFF'
-        '\U0001FA70-\U0001FAFF'
-        '\U000025A0-\U000025FF'
+    emoji_pattern = re.compile('['
+        '\U00002700-\U000027BF' # Dingbats
+        '\U0001F000-\U0001F9FF' # Emojis
         ']+',
         flags=re.UNICODE
     )
@@ -77,38 +83,40 @@ def remove_emojis(text):
 
 
 def main() -> int:
+
     # my path
-    mypath = abspath(__file__)
-    mydir, myname = dirname(mypath), basename(mypath)
+    my_path = os.path.abspath(__file__)
+    my_dir  = os.path.dirname(my_path)
+    my_name = os.path.basename(my_path)
 
-    # arguments
-    parser = argparse.ArgumentParser(prog=myname)
-    parser.add_argument('--critical',
-                        action='store_true',
-                        help='print critical posts only',
-                        required=False)
-    parser.add_argument('--silent',
-                        action='store_true',
-                        help='no sound',
-                        required=False)
-    args = parser.parse_args()
+    # get arguments
+    arguments = get_arguments(my_name)
 
-    # prepare logging (set log_folder)
-    log_folder = environ['BSKY_LOG_FOLDER'] if 'BSKY_LOG_FOLDER' in environ else None
-    if log_folder:
-        # remove trailing slash
-        while log_folder.endswith('/') and not (log_folder == '/'):
-            log_folder = log_folder[:-1]
-        # check path
-        if not isdir(log_folder):
-            print('the folder', log_folder, 'does not exist!')
-            return 'logging error'
+    # load configuration file
+    config = read_configuration(my_dir, my_name)
+    # set up handle
+    try: login = (str(config['login_user']),
+                  str(config['login_pass']))
+    except: return 'error: handle missing'
+    # set up interval
+    try: interval = int(config['interval'])
+    except: interval = 60
+    # set up sound
+    try: enable_sound = bool(config['enable_sound'])
+    except: enable_sound = True
+    if enable_sound:
+        from playsound3 import playsound
+    # set up logging
+    try:
+        log_folder = str(config['log_folder'])
+        if not os.path.isdir(log_folder):
+            return 'error: log_folder missing'
+    except: log_folder = None
 
     # create bluesky client
     logo = chr(129419)
     print('\n' + logo, 'loading atproto...', end=' ', flush=True)
-    try:
-        from atproto import Client
+    try: from atproto import Client
     except Exception as e:
         print(ln_clear())
         return 'atproto error: ' + str(e)
@@ -130,7 +138,7 @@ def main() -> int:
         # get the feed
         try: feed = client.get_timeline(limit=20).feed
         except Exception: # wait
-            try: sleep(interval)
+            try: time.sleep(interval)
             except KeyboardInterrupt:
                 print(ln_clear())
                 return 0
@@ -162,7 +170,8 @@ def main() -> int:
 
         # process new messages
         now = datetime.now(tz=timezone.utc).astimezone()
-        log = log_folder + '/bsky_' + now.strftime('%Y-%m-%d') + '.log' if log_folder else None
+        log_name = 'bsky_' + now.strftime('%Y-%m-%d') + '.log'
+        log = os.path.join(log_folder, log_name) if log_folder else None
         new_criticals = False
 
         for msg in new_messages:
@@ -202,22 +211,22 @@ def main() -> int:
                 text = match_fmt(text, p, c(196), f(0))
 
             # print message
-            if args.critical and (not critical): continue
+            if arguments.critical and (not critical): continue
             if reposter: print(reposter)
             print(author, handle, '⋅', timedelta)
             print(text + '\n')
 
         # notify sound
-        if enable_sound and (not args.silent) and new_criticals:
-            try: playsound(mydir + '/incoming.m4a')
+        if enable_sound and (not arguments.silent) and new_criticals:
+            try: playsound(os.path.join(my_dir, 'incoming.m4a'))
             except Exception: pass
 
         # wait…
-        try: sleep(interval)
+        try: time.sleep(interval)
         except KeyboardInterrupt:
             print(ln_clear(), end='')
             return 0
 
 
 if __name__ == '__main__':
-    exit(main())
+    sys.exit(main())
