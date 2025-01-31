@@ -1,0 +1,5 @@
+login_user = "your-handle-here"
+login_pass = "your-password-here"
+interval = 60
+enable_sound = true
+log_folder = "/path/to/logs"
