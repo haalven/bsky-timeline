@@ -2,5 +2,5 @@
 - your [bsky.app](https://bsky.app/) timeline live in the terminal
 - pip install [atproto](https://github.com/MarshalX/atproto) [playsound3](https://github.com/sjmikler/playsound3)
 - adjust `bsky.py.toml`
-- usage: `bsky [--critical] [--silent]`
+- usage: `bsky.py [--critical] [--silent]`
 - you can run this thing in [`tmux`](https://tmux.github.io/)
