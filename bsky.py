@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 # Bluesky timeline live
 # usage: bsky [--critical] [--silent]
 
@@ -8,12 +7,7 @@
 # https://atproto.blue/en/latest/atproto_client/client.html
 
 
-import sys
-import os.path
-import tomllib
-import argparse
-import re
-import time
+import sys, os.path, tomllib, argparse, re, time
 from datetime import datetime, timezone
 
 
@@ -41,7 +35,7 @@ def get_arguments(my_name):
     return parser.parse_args()
 
 
-# readable timedelta
+# timedelta
 def ago(td):
     secs = td.total_seconds()
     mins, secs = divmod(secs, 60)
@@ -59,13 +53,13 @@ def ago(td):
     else: return f'{secs:.0f}s'
 
 
-# xterm formatting signals
+# xterm formatting
 def ln_clear(): return '\r\x1B[K'
 def f(code): return '\x1B[' + str(code) + 'm'
 def c(code): return f('38;5;' + str(code))
 
 
-# colored regex matches
+# colored re matches
 def match_fmt(text, pattern, FMT1, FMT2):
     def color_str(match):
         return FMT1 + match.group() + FMT2
@@ -75,8 +69,8 @@ def match_fmt(text, pattern, FMT1, FMT2):
 # remove emojis
 def remove_emojis(text):
     emoji_pattern = re.compile('['
-        '\U00002700-\U000027BF' # Dingbats
-        '\U0001F000-\U0001F9FF' # Emojis
+        '\U00002700-\U000027BF' # dings
+        '\U0001F000-\U0001F9FF' # emojis
         ']+',
         flags=re.UNICODE
     )
@@ -110,11 +104,13 @@ def main() -> int:
     # set up logging
     try:
         log_folder = str(config['log_folder'])
-        if not os.path.isdir(log_folder):
-            return 'error: log_folder missing'
+        if log_folder == '':
+            log_folder = None
+        elif not os.path.isdir(log_folder):
+            return 'error: log_folder: ' + str(log_folder)
     except: log_folder = None
 
-    # create bluesky client
+    # create bsky client
     logo = chr(129419)
     print('\n' + logo, 'loading atproto...', end=' ', flush=True)
     try: from atproto import Client
@@ -182,10 +178,18 @@ def main() -> int:
             # datetime object
             timestamp = datetime.fromisoformat(date).astimezone()
 
-            # handle newlines, emojis
-            while 2*'\n' in text: text = text.replace(2*'\n', '\n')
-            text = text.replace('\n', ' ⏎ ')
-            text, author = (remove_emojis(text), remove_emojis(author))
+            # text processing
+            # remove emojis
+            author, text = (remove_emojis(author), remove_emojis(text))
+            # remove empty lines; replace nl with symbol
+            text = re.sub(r'\n\s*\n', '\n', text)
+            newline_symbol = '\x20' + chr(9166) + '\x20'
+            text = text.replace('\n', newline_symbol)
+            # collapse whitespace
+            author = re.sub(r'\s+', '\x20', author)
+            author = author.strip()
+            text = re.sub(r'\s+', '\x20', text)
+            text = text.strip()
 
             # log message
             if log:
@@ -195,7 +199,7 @@ def main() -> int:
             # calculate timedelta
             timedelta = ago(now - timestamp)
 
-            # message formatting
+            # terminal formatting
             if reposter:
                 reposter = '⇄ Reposted by ' + reposter
                 reposter = c(33) + f(2) + reposter + f(0)
@@ -205,7 +209,7 @@ def main() -> int:
 
             # detect and format critical
             critical = False
-            pattern = r'^(BREAKING|BOMBSHELL)\b'
+            pattern = r'^(BREAKING|BOMBSHELL|SCOOP|NEW)\b'
             p = re.compile(pattern, re.IGNORECASE)
             if bool(p.search(text)):
                 critical, new_criticals = True, True
