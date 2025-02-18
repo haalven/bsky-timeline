@@ -4,3 +4,4 @@
 - edit `bsky.py.toml`
 - usage: `bsky.py [--critical] [--silent]`
 - you can run this thing in [`tmux`](https://tmux.github.io/)
+- based on [broiler](https://github.com/haalven/broiler)
