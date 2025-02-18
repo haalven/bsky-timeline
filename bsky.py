@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Bluesky timeline live
-# usage: bsky [--critical] [--silent]
+# usage: bsky.py [--critical] [--silent]
 
 # https://github.com/MarshalX/atproto
 # https://atproto.blue/en/latest/atproto_client/client.html
