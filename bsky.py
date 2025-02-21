@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 # Bluesky timeline live
 # usage: bsky.py [--critical] [--silent]
 
@@ -75,6 +76,13 @@ def remove_emojis(text):
         flags=re.UNICODE
     )
     return emoji_pattern.sub('', text)
+
+
+def typer(text, delay=0.0025):
+    for c in text:
+        print(c, end='', flush=True)
+        time.sleep(delay)
+    print()
 
 
 def main() -> int:
@@ -219,7 +227,7 @@ def main() -> int:
             if arguments.critical and (not critical): continue
             if reposter: print(reposter)
             print(author, handle, '⋅', timedelta)
-            print(text + '\n')
+            typer(text + '\n')
 
         # notify sound
         if enable_sound and (not arguments.silent) and new_criticals:
