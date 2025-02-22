@@ -109,6 +109,9 @@ def main() -> int:
     except: enable_sound = True
     if enable_sound:
         from playsound3 import playsound
+    # set up typing effect
+    try: enable_typing = bool(config['enable_typing'])
+    except: enable_typing = True
     # set up logging
     try:
         log_folder = str(config['log_folder'])
@@ -227,7 +230,8 @@ def main() -> int:
             if arguments.critical and (not critical): continue
             if reposter: print(reposter)
             print(author, handle, '⋅', timedelta)
-            typer(text + '\n')
+            if enable_typing: typer(text + '\n')
+            else: print(text + '\n')
 
         # notify sound
         if enable_sound and (not arguments.silent) and new_criticals:
