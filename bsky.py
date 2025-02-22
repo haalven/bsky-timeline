@@ -111,7 +111,7 @@ def main() -> int:
     if enable_sound:
         from playsound3 import playsound
     # set up typing effect
-    try: enable_typing = bool(config['enable_typing'])
+    try: enable_typing = bool(config['typing_effect'])
     except: enable_typing = True
     # set up logging
     try:
