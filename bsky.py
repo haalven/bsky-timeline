@@ -78,6 +78,7 @@ def remove_emojis(text):
     return emoji_pattern.sub('', text)
 
 
+# typing effect
 def typer(text, delay=0.0025):
     for c in text:
         print(c, end='', flush=True)
