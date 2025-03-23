@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 # Bluesky timeline live
 # usage: bsky.py [--critical] [--silent]
 
