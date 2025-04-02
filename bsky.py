@@ -66,15 +66,29 @@ def match_fmt(text, pattern, FMT1, FMT2):
     return pattern.sub(color_str, text)
 
 
-# remove emojis
-def remove_emojis(text):
-    emoji_pattern = re.compile('['
-        '\U00002700-\U000027BF' # dings
-        '\U0001F000-\U0001F9FF' # emojis
-        ']+',
-        flags=re.UNICODE
-    )
-    return emoji_pattern.sub('', text)
+# filter characters
+def char_filter(text):
+    whitelist_pattern = r'[^' \
+        r'\u0020-\u007E' \
+        r'\u00A0-\u00FF' \
+        r'\u0100-\u024F' \
+        r'\u0370-\u03FF' \
+        r'\u0400-\u04FF' \
+        r'\u0590-\u05FF' \
+        r'\u0600-\u06FF' \
+        r'\u0900-\u097F' \
+        r'\u3040-\u309F' \
+        r'\u30A0-\u30FF' \
+        r'\u4E00-\u9FFF' \
+        r'\uAC00-\uD7AF' \
+        r'\u2000-\u206F' \
+        r'\u2070-\u209F' \
+        r'\u20A0-\u20CF' \
+        r'\u2200-\u22FF' \
+        r'\u2300-\u23FF' \
+        r']'
+    return re.sub(whitelist_pattern, '', text)
+
 
 
 # typing effect
@@ -191,7 +205,7 @@ def main() -> int:
 
             # text processing
             # remove emojis
-            author, text = (remove_emojis(author), remove_emojis(text))
+            author, text = (char_filter(author), char_filter(text))
             # remove empty lines; replace nl with symbol
             text = re.sub(r'\n\s*\n', '\n', text)
             newline_symbol = '\x20' + chr(9166) + '\x20'
