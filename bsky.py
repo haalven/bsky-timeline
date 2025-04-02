@@ -69,6 +69,7 @@ def match_fmt(text, pattern, FMT1, FMT2):
 # filter characters
 def char_filter(text):
     whitelist_pattern = r'[^' \
+        r'\s\n' \
         r'\u0020-\u007E' \
         r'\u00A0-\u00FF' \
         r'\u0100-\u024F' \
@@ -88,7 +89,6 @@ def char_filter(text):
         r'\u2300-\u23FF' \
         r']'
     return re.sub(whitelist_pattern, '', text)
-
 
 
 # typing effect
