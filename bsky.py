@@ -91,6 +91,11 @@ def char_filter(text):
     return re.sub(whitelist_pattern, '', text)
 
 
+# collapse whitespace
+def collapse_whitespace(text):
+    return re.sub(r'\s+', '\x20', text).strip()
+
+
 # typing effect
 def typer(text, delay=0.0025):
     for c in text:
@@ -204,17 +209,14 @@ def main() -> int:
             timestamp = datetime.fromisoformat(date).astimezone()
 
             # text processing
-            # remove emojis
-            author, text = (char_filter(author), char_filter(text))
-            # remove empty lines; replace nl with symbol
-            text = re.sub(r'\n\s*\n', '\n', text)
-            newline_symbol = '\x20' + chr(9166) + '\x20'
-            text = text.replace('\n', newline_symbol)
+            # remove color symbols
+            author = char_filter(author)
+            text = char_filter(text)
+            # preserve newlines in text
+            text = text.replace('\n', '\\n')
             # collapse whitespace
-            author = re.sub(r'\s+', '\x20', author)
-            author = author.strip()
-            text = re.sub(r'\s+', '\x20', text)
-            text = text.strip()
+            author = collapse_whitespace(author)
+            text = collapse_whitespace(text)
 
             # log message
             if log:
