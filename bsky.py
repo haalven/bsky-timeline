@@ -97,7 +97,7 @@ def collapse_whitespace(text):
 
 
 # typing effect
-def typer(text, delay=0.0025):
+def typer(text, delay=0.001):
     for c in text:
         print(c, end='', flush=True)
         time.sleep(delay)
