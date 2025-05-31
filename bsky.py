@@ -86,7 +86,6 @@ def char_filter(text):
         r'\u2070-\u209F' \
         r'\u20A0-\u20CF' \
         r'\u2200-\u22FF' \
-        r'\u2300-\u23FF' \
         r']'
     return re.sub(whitelist_pattern, '', text)
 
