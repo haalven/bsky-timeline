@@ -70,22 +70,10 @@ def match_fmt(text, pattern, FMT1, FMT2):
 def char_filter(text):
     whitelist_pattern = r'[^' \
         r'\s\n' \
-        r'\u0020-\u007E' \
-        r'\u00A0-\u00FF' \
-        r'\u0100-\u024F' \
-        r'\u0370-\u03FF' \
-        r'\u0400-\u04FF' \
-        r'\u0590-\u05FF' \
-        r'\u0600-\u06FF' \
-        r'\u0900-\u097F' \
-        r'\u3040-\u309F' \
-        r'\u30A0-\u30FF' \
-        r'\u4E00-\u9FFF' \
-        r'\uAC00-\uD7AF' \
-        r'\u2000-\u206F' \
-        r'\u2070-\u209F' \
-        r'\u20A0-\u20CF' \
-        r'\u2200-\u22FF' \
+        r'\u0020-\u007e' \
+        r'\u00a0-\u200a' \
+        r'\u2010-\u22ff' \
+        r'\u2c00-\ufdff' \
         r']'
     return re.sub(whitelist_pattern, '', text)
 
