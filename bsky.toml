@@ -2,5 +2,6 @@ login_user = "your-handle-here"
 login_pass = "your-password-here"
 interval = 60
 enable_sound = true
+show_newlines = false
 typing_effect = true
 log_folder = "/path/to/logs"
