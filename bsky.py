@@ -134,6 +134,12 @@ def main():
         elif not os.path.isdir(log_folder):
             return 'error: log_folder: ' + str(log_folder)
     except: log_folder = None
+    # set up newlines
+    try:
+        show_newlines = bool(config['show_newlines'])
+    except:
+        show_newlines = False
+    print('show_newlines:', str(show_newlines))
 
     # create bsky client
     logo = chr(129419)
@@ -244,8 +250,11 @@ def main():
                 critical, new_criticals = True, True
                 text = match_fmt(text, p, c(196), f(0))
 
-            # new lines format
-            text = text.replace('\\n', f(2) + '⮐' + f(22) + '\n')
+            # newlines format
+            if show_newlines:
+                text = text.replace('\\n', f(2) + '⮐' + f(22) + '\n')
+            else: # collapse
+                text = '\n'.join(l.strip() for l in text.split('\\n') if l.strip())
 
             # print message
             if arguments.critical and (not critical):
