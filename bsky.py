@@ -261,8 +261,9 @@ def main():
 
             # replace truncated URLs
             if uri:
-                text = '\n'.join(text.split('\n')[:-1])
-                text += '\n' + f(4) + f(2) + uri + f(0)
+                text = '\n'.join(text.split('\n')[:-1]).strip()
+                if text: text += '\n'
+                text += f(4) + f(2) + uri + f(0)
 
             # print message
             if arguments.critical and (not critical):
