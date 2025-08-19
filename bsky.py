@@ -193,12 +193,16 @@ def main():
                     author = handle
                 text = post.record.text.strip()
                 date = post.record.created_at
+                try:
+                    uri = post.record.embed.external.uri
+                except:
+                    uri = None
             except Exception as e:
                 continue
 
             # a real new post?
             if text and not (id in known_ids):
-                new_messages.insert(0, (date,reposter,handle,author,text))
+                new_messages.insert(0, (date,reposter,handle,author,text,uri))
                 known_ids.append(id)
 
         # process new messages
@@ -209,7 +213,7 @@ def main():
 
         for msg in new_messages:
             # expand msg
-            date, reposter, handle, author, text = msg
+            date, reposter, handle, author, text, uri = msg
 
             # datetime object
             timestamp = datetime.fromisoformat(date).astimezone()
@@ -254,6 +258,11 @@ def main():
                 text = text.replace('\\n', f(2) + '⮐' + f(22) + '\n')
             else: # collapse
                 text = '\n'.join(l.strip() for l in text.split('\\n') if l.strip())
+
+            # replace truncated URLs
+            if uri:
+                text = '\n'.join(text.split('\n')[:-1])
+                text += '\n' + f(4) + f(2) + uri + f(0)
 
             # print message
             if arguments.critical and (not critical):
