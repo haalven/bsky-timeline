@@ -139,7 +139,6 @@ def main():
         show_newlines = bool(config['show_newlines'])
     except:
         show_newlines = False
-    print('show_newlines:', str(show_newlines))
 
     # create bsky client
     logo = chr(129419)
