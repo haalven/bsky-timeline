@@ -91,7 +91,7 @@ def typer(text, delay=0.001):
     print()
 
 
-def main() -> int:
+def main():
 
     # my path
     my_path = os.path.abspath(__file__)
@@ -104,20 +104,28 @@ def main() -> int:
     # load configuration file
     config = read_configuration(my_dir, my_name)
     # set up handle
-    try: login = (str(config['login_user']),
-                  str(config['login_pass']))
-    except: return 'error: handle missing'
+    try:
+        login = (str(config['login_user']),
+                 str(config['login_pass']))
+    except:
+        return 'error: handle missing'
     # set up interval
-    try: interval = int(config['interval'])
-    except: interval = 60
+    try:
+        interval = int(config['interval'])
+    except:
+        interval = 60
     # set up sound
-    try: enable_sound = bool(config['enable_sound'])
-    except: enable_sound = True
+    try:
+        enable_sound = bool(config['enable_sound'])
+    except:
+        enable_sound = True
     if enable_sound:
         from playsound3 import playsound
     # set up typing effect
-    try: enable_typing = bool(config['typing_effect'])
-    except: enable_typing = True
+    try:
+        enable_typing = bool(config['typing_effect'])
+    except:
+        enable_typing = True
     # set up logging
     try:
         log_folder = str(config['log_folder'])
@@ -130,7 +138,8 @@ def main() -> int:
     # create bsky client
     logo = chr(129419)
     print('\n' + logo, 'loading atproto...', end=' ', flush=True)
-    try: from atproto import Client
+    try:
+        from atproto import Client
     except Exception as e:
         print(ln_clear())
         return 'atproto error: ' + str(e)
@@ -150,9 +159,11 @@ def main() -> int:
     while True:
 
         # get the feed
-        try: feed = client.get_timeline(limit=20).feed
+        try:
+            feed = client.get_timeline(limit=20).feed
         except Exception: # wait
-            try: time.sleep(interval)
+            try:
+                time.sleep(interval)
             except KeyboardInterrupt:
                 print(ln_clear())
                 return 0
@@ -164,14 +175,17 @@ def main() -> int:
             # parse feed
             try:
                 post = item.post
-                if post.record.reply: continue
+                if post.record.reply:
+                    continue
                 reposter = '@'+item.reason.by.handle if item.reason else None
                 id = post.cid
                 handle = post.author.handle
-                if not handle: continue
+                if not handle:
+                    continue
                 handle = '@' + handle
                 author = post.author.display_name.strip()
-                if not author: author = handle
+                if not author:
+                    author = handle
                 text = post.record.text.strip()
                 date = post.record.created_at
             except Exception as e:
@@ -208,7 +222,8 @@ def main() -> int:
             # log message
             if log:
                 line = timestamp.isoformat() + '\x20' + handle + '\x20' + text + '\n'
-                with open(log, 'a') as logfile: logfile.write(line)
+                with open(log, 'a') as logfile:
+                    logfile.write(line)
 
             # calculate timedelta
             timedelta = ago(now - timestamp)
@@ -229,20 +244,30 @@ def main() -> int:
                 critical, new_criticals = True, True
                 text = match_fmt(text, p, c(196), f(0))
 
+            # new lines format
+            text = text.replace('\\n', f(2) + '⮐' + f(22) + '\n')
+
             # print message
-            if arguments.critical and (not critical): continue
-            if reposter: print(reposter)
+            if arguments.critical and (not critical):
+                continue
+            if reposter:
+                print(reposter)
             print(author, handle, '⋅', timedelta)
-            if enable_typing: typer(text + '\n')
-            else: print(text + '\n')
+            if enable_typing:
+                typer(text + '\n')
+            else:
+                print(text + '\n')
 
         # notify sound
         if enable_sound and (not arguments.silent) and new_criticals:
-            try: playsound(os.path.join(my_dir, 'incoming.m4a'))
-            except Exception: pass
+            try:
+                playsound(os.path.join(my_dir, 'incoming.m4a'), block=False)
+            except Exception:
+                pass
 
         # wait…
-        try: time.sleep(interval)
+        try:
+            time.sleep(interval)
         except KeyboardInterrupt:
             print(ln_clear(), end='')
             return 0
